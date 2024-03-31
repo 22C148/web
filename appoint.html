@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Appointment Booking</title>
+<style>
+body {
+font-family:'Times New Roman', Times, serif;
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+
+}
+
+header, footer {
+background-color: #3498db;
+color: #fff;
+text-align: center;
+padding: 10px;
+}
+
+main {
+flex: 1;
+display: flex;
+align-items: center;
+justify-content: center;
+margin: 20px;
+
+}
+
+.appointment-box {
+border: 1px solid #ccc;
+padding: 20px;
+border-radius: 8px;
+background-color: lightblue;
+height: fit-content;
+width: fit-content;
+position: center;
+}
+
+form {
+max-width: 400px;
+margin: 0 auto;
+}
+
+label {
+display: block;
+margin-bottom: 3px;
+}
+
+input[type="radio"]
+{
+margin-bottom: 4px;
+width: 50%;
+box-sizing: border-box;
+align-items:baseline
+}
+input, select {
+width: 100%;
+padding: 8px;
+margin-bottom: 10px;
+box-sizing: border-box;
+box-shadow: inset;
+}
+
+
+
+button {
+background-color: #1496ec;
+color: #fff;
+padding: 10px 15px;
+border: none;
+cursor: pointer;
+}
+
+#generatedImage {
+max-width: 100%;
+margin-top: 20px;
+}
+
+.error {
+color: #e74c3c;
+margin-top: 5px;
+}
+
+#output {
+margin-top: 20px;
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Hospital Management System</h1>
+</header>
+<main>
+<div class="appointment-box">
+<h2>Appointment Booking Form</h2>
+<form id="appointmentForm" onsubmit="event.preventDefault(); bookAppointment();" ontouchstart="handleTouchStart(event)"
+ontouchmove="handleTouchMove(event)"
+ontouchend="handleTouchEnd(event)">
+<label for="name">Name:</label>
+<input type="text" name="name" id="name"  onfocus="handleFocus()"
+onblur="charupper()"
+required />
+
+<label for="dob">Date of Birth:</label>
+<input type="date" id="dob" onchange="calculateAge()" required>
+
+
+<label for="age">Age:</label>
+<input type="text" id="age" readonly>
+
+<label >Gender: </label>
+<label for="male"> <input type="radio" id="male" name="gender" value="male" required onfocus="handleFocus()">Male
+</label><br>
+<label for="female"><input type="radio" id="female" name="gender" value="female" required onfocus="handleFocus()">Female
+</label>
+
+
+<label for="email">Email:</label>
+<input type="email" id="email" required>
+<label for="date">Date:</label>
+<input type="date" id="date"  onfocus="handleFocus()" onkeydown="handleKeyDown(event)"
+onkeyup="handleKeyUp(event)"
+onkeypress="handleKeyPress(event)"
+required>
+
+<label for="time">Time:</label>
+<input type="time" id="time" onfocus="handleFocus()" onkeydown="handleKeyDown(event)"
+onkeyup="handleKeyUp(event)"
+onkeypress="handleKeyPress(event)"
+required>
+
+
+
+<label for="doctor">Ava. Doctor:</label>
+<select id="doc"
+onkeydown="handleKeyDown(event)"
+onkeyup="handleKeyUp(event)"
+onkeypress="handleKeyPress(event)"
+onkeypress="handleKeyPress(event)"  onchange="youroption()" >
+<option value="Dr. Rupa"> Dr.Rupa</option>
+<option value="Dr.Gopi">Dr. Gopi</option>
+<option value="Dr.Rajan">Dr. Rajan</option>
+<option value="Dr.Vasanth">Dr. Vasanth</option>
+<option value="Dr.Durga">Dr. Durga</option>
+<option value="Dr.parkash">Dr. Parkash</option>
+</select>
+
+<p id="demo" style="color:blue;"></p>
+<br /><br />
+
+
+<button type="submit" id="sub" onclick="bookAppointment()" onmouseover="handleMouseOver()" onmouseout="handleMouseOut()" >Book Appointment</button>
+</form>
+
+<div id="errorMessages" class="error"></div>
+</div>
+</main>
+<div id="output"></div>
+<footer>
+<p>&copy; 2024 Hospital Management System</p>
+</footer>
+
+<script>
+let appointments = [];
+
+
+function handleMouseOver() {
+const button = document.getElementById("sub");
+button.style.backgroundColor=  "#e74c3c";
+}
+
+function handleMouseOut() {
+const button = document.getElementById("sub");
+button.style.backgroundColor = "";
+}
+
+function handleKeyDown(event) {
+document.getElementById('errorMessages').innerText = 'Key Down: ' + event.key;
+};
+
+function handleKeyUp(event) {
+document.getElementById('errorMessages').innerText = 'Key Up: ' + event.key;
+};
+
+function handleKeyPress(event) {
+document.getElementById('errorMessages').innerText = 'Key Pressed: ' + event.key;
+};
+
+function handleTouchStart(event) {
+document.getElementById('errorMessages').innerText = 'Touch Started!';
+};
+
+function handleTouchMove(event) {
+document.getElementById('errorMessages').innerText = 'Touch Moved!';
+};
+
+function handleTouchEnd(event) {
+document.getElementById('errorMessages').innerText = 'Touch Ended!';
+};
+
+function handleFocus() {
+document.getElementById('errorMessages').innerText = 'Input field focused!';
+}
+
+function bookAppointment() {
+
+
+const name = document.getElementById('name').value;
+const gender = document.querySelector('input[name="gender"]:checked').value;
+const email = document.getElementById('email').value;
+const date = document.getElementById('date').value;
+const time = document.getElementById('time').value;
+const doc = document.getElementById('doc').value;
+const dobInput = document.getElementById('dob');
+const ageInput = document.getElementById('age');
+
+const errorMessages = document.getElementById('errorMessages');
+errorMessages.innerHTML = '';
+
+if (name === '' || email === '' || date === '' || time === '' || doc === '' || dobInput == '' || ageInput == '') {
+errorMessages.innerHTML = 'Please fill all fields before booking the appointment.';
+focusOnError('name');
+return;
+}
+
+if (email.indexOf('@') === -1) {
+errorMessages.innerHTML = 'Please enter a valid email address.';
+focusOnError('email');
+return;
+}
+
+const appointment = {
+name: name,
+gender: gender,
+email: email,
+date: date,
+time: time,
+doc: doc,
+dobInput:dobInput,
+ageInput:ageInput
+
+};
+
+appointments.push(appointment);
+
+alert('Appointment booked successfully for ' + name);
+
+displayAppointments();
+
+document.getElementById('appointmentForm').reset();
+}
+
+function youroption()
+{
+let x = document.getElementById("doc").value;
+document.getElementById("demo") .innerHTML = "You selected: " + x;
+}
+
+
+
+
+function focusOnError(fieldName) {
+const inputField = document.getElementById(fieldName);
+if (inputField) {
+inputField.focus();
+}
+}
+
+function charupper() {
+let x = document.getElementById("name");
+x.value = x.value.toUpperCase();
+}
+
+function calculateAge() {
+const dobInput = document.getElementById('dob');
+const ageInput = document.getElementById('age');
+
+const dob = new Date(dobInput.value);
+const today = new Date();
+let age = today.getFullYear() - dob.getFullYear();
+const monthDiff = today.getMonth() - dob.getMonth();
+
+if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+age--;
+}
+
+ageInput.value = age;
+}
+
+function displayAppointments() {
+const outputElement = document.getElementById('output');
+outputElement.innerHTML = '<h2>Booked Appointments</h2>';
+
+if (appointments.length === 0) {
+outputElement.innerHTML += '<p>No appointments booked yet.</p>';
+} else {
+outputElement.innerHTML += '<ul>';
+appointments.forEach(appointment => {
+outputElement.innerHTML += `<li>Name: ${appointment.name}, Gender: ${appointment.gender}, Email: ${appointment.email}, Date: ${appointment.date}, Time: ${appointment.time}, Doctor: ${appointment.doc}</li>`;
+});
+outputElement.innerHTML += '</ul>';
+}
+}
+</script>
+</body>
+</html>
+
+
+
